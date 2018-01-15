@@ -1,19 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ssl_des.h                                       :+:      :+:    :+:   */
+/*   ft_strjoin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/01/11 15:15:10 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/15 14:00:28 by yazhu            ###   ########.fr       */
+/*   Created: 2017/11/28 18:14:20 by yazhu             #+#    #+#             */
+/*   Updated: 2017/11/29 17:46:26 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_SSL_DES_H
-# define FT_SSL_DES_H
+#include "libft.h"
 
-# include "libft.h"
-# include <fcntl.h>
+char	*ft_strjoin(char const *s1, char const *s2)
+{
+	size_t	len;
+	char	*str;
 
-#endif
+	if (s1 && s2)
+	{
+		len = ft_strlen(s1) + ft_strlen(s2);
+		str = (char *)malloc((len + 1) * sizeof(char));
+		if (str)
+		{
+			ft_strcpy(str, s1);
+			ft_strcat(str, s2);
+			return (str);
+		}
+	}
+	return (NULL);
+}

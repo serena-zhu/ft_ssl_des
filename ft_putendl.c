@@ -1,19 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ssl_des.h                                       :+:      :+:    :+:   */
+/*   ft_putendl.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/01/11 15:15:10 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/15 14:00:28 by yazhu            ###   ########.fr       */
+/*   Created: 2017/11/29 12:05:05 by yazhu             #+#    #+#             */
+/*   Updated: 2017/11/29 12:07:22 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_SSL_DES_H
-# define FT_SSL_DES_H
+#include "libft.h"
 
-# include "libft.h"
-# include <fcntl.h>
-
-#endif
+void	ft_putendl(char const *s)
+{
+	ft_putstr(s);
+	write(1, "\n", 1);
+}

@@ -1,19 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ssl_des.h                                       :+:      :+:    :+:   */
+/*   ft_bzero.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/01/11 15:15:10 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/15 14:00:28 by yazhu            ###   ########.fr       */
+/*   Created: 2017/11/27 16:55:49 by yazhu             #+#    #+#             */
+/*   Updated: 2017/11/30 15:59:50 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_SSL_DES_H
-# define FT_SSL_DES_H
+#include "libft.h"
 
-# include "libft.h"
-# include <fcntl.h>
+void	ft_bzero(void *s, size_t n)
+{
+	size_t i;
 
-#endif
+	i = 0;
+	while (i < n)
+	{
+		((char *)s)[i] = 0;
+		i++;
+	}
+}

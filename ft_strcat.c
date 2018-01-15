@@ -1,19 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_ssl_des.h                                       :+:      :+:    :+:   */
+/*   ft_strcat.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/01/11 15:15:10 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/15 14:00:28 by yazhu            ###   ########.fr       */
+/*   Created: 2017/10/31 15:39:26 by yazhu             #+#    #+#             */
+/*   Updated: 2017/11/30 16:40:24 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_SSL_DES_H
-# define FT_SSL_DES_H
+char	*ft_strcat(char *s1, const char *s2)
+{
+	int i;
+	int len;
 
-# include "libft.h"
-# include <fcntl.h>
-
-#endif
+	i = 0;
+	len = 0;
+	while (s1[len] != '\0')
+	{
+		len++;
+	}
+	while (s2[i] != '\0')
+	{
+		s1[len + i] = s2[i];
+		i++;
+	}
+	s1[len + i] = '\0';
+	return (s1);
+}
