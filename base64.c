@@ -1,26 +1,85 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   base64.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/01/11 15:03:26 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/15 18:12:50 by yazhu            ###   ########.fr       */
+/*   Created: 2018/01/15 17:18:40 by yazhu             #+#    #+#             */
+/*   Updated: 2018/01/15 18:12:41 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl_des.h"
-#include <stdio.h> //delete me!!
 
-void	des(char **argv)
+char gbase64[65] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+					'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+					'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+					'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+					's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2',
+					'3','4', '5', '6', '7', '8', '9', '+', '/', '\0'};
+
+void	encryption(char *s, int fd_out)
 {
-	(void)argv;
+	int i;
+	int	j;
+	int value;
+	char group[5];
+
+	i = 0;
+	while (s[i] != '\0')
+	{
+		j = 0;
+		value = 0;
+		ft_bzero(group, 5);
+		while (s[i] != '\0' && j < 3)
+			value += ft_power(256, 3 - (++j)) * s[i++];
+		while (j < 3)
+			group[++j] = '=';
+		while (j >= 0)
+		{
+			group[j] = (group[j] != '=') ? gbase64[value % 64] : group[j];
+			value /= 64;
+			j--;
+		}
+		ft_putstr_fd(group, fd_out);
+		ft_putstr_fd((i != 0 && i % 48 == 0 && group[0] && s[i]) ? "\n" : "", fd_out);
+	}
+	ft_putstr_fd((group[0]) ? "\n" : "", fd_out);
 }
 
-void	des_cbc(char **argv)
+void	decryption(char *s, int fd_out)
 {
-	(void)argv;
+	int i;
+	int	j;
+	int value;
+	char group[5];
+	int index;
+	int abort;
+
+	i = 0;
+	abort = 0;
+	while (s[i] != '\0' && !abort && !(j = 0))
+	{
+		value = 0;
+		ft_bzero(group, 5);
+		while (s[i] != '\0' && j < 4 && !abort && !(index = 0))
+		{
+			i = (i != 0 && i % 64 == 0 && s[i] == '\n') ? i + 1 : i;
+			while (s[i] != '=' && index < 64 && gbase64[index] != s[i])
+				index++;
+			abort = (index == 64) ? 1 : 0;
+			value += ft_power(64, 4 - (++j)) * index;
+			i++;
+		}
+		while (j-- >= 0)
+		{
+			group[j - 1] = value % 256;
+			(ft_haschar(gbase64, value % 256)) ? value /= 256 : exit(1);
+		}
+		ft_putstr_fd((!abort) ? group : "", fd_out);
+	}
+	ft_putstr_fd((!abort) ? "\n" : "", fd_out);
 }
 
 /*
@@ -29,7 +88,7 @@ void	des_cbc(char **argv)
 ** error [2] : usuage error
 ** error [3] : invalid file error
 */
-/*
+
 void	option_file_error(char **argv, int i, int error)
 {
 	if (error == 0)
@@ -57,69 +116,6 @@ void	option_file_error(char **argv, int i, int error)
 		ft_putstr(": No such file or directory\n");
 	}
 	exit(1);
-}
-
-void	encryption(char *s, int encrypt, int fd_out)//, char *i_file, char *o_file)
-{
-	int i;
-	int	j;
-	int value;
-	char group[5];
-	int index;
-	int abort;
-
-	abort = 0;
-	i = 0;
-	j = 0;
-	if (encrypt)
-	{
-		while (s[i] != '\0')
-		{
-			j = 0;
-			value = 0;
-			ft_bzero(group, 5);
-			while (s[i] != '\0' && j < 3)
-				value += ft_power(256, 3 - (++j)) * s[i++];
-//				value = s[0] * 256 * 256 + s[1] * 256 + s[2];
-			while (j < 3)
-				group[++j] = '=';
-			while (j >= 0)
-			{
-				group[j] = (group[j] != '=') ? gbase64[value % 64] : group[j];
-				value /= 64;
-				j--;
-			}
-			ft_putstr_fd(group, fd_out);
-			ft_putstr_fd((i != 0 && i % 48 == 0 && group[0] && s[i]) ? "\n" : "", fd_out);
-		}
-		ft_putstr_fd((group[0]) ? "\n" : "", fd_out);
-	}
-	else
-	{
-		while (s[i] != '\0' && !abort)
-		{
-			j = 0;
-			value = 0;
-			ft_bzero(group, 5);
-			while (s[i] != '\0' && j < 4 && !abort)
-			{
-				index = 0;
-				i = (i != 0 && i % 64 == 0 && s[i] == '\n') ? i + 1 : i;
-				while (s[i] != '=' && index < 64 && gbase64[index] != s[i])
-					index++;
-				abort = (index == 64) ? 1 : 0;
-				value += ft_power(64, 4 - (++j)) * index;
-				i++;
-			}
-			while (j-- >= 0)
-			{
-				group[j - 1] = value % 256;
-				value /= 256;
-			}
-			ft_putstr((!abort) ? group : "");
-		}
-		ft_putstr((!abort) ? "\n" : "");		
-	}
 }
 
 void	base64(int argc, char **argv)
@@ -150,28 +146,4 @@ void	base64(int argc, char **argv)
 	}
 	(i < argc) ? option_file_error(argv, i, 2 * (argv[i][0] == '-')) : 0;
 	(encrypt) ? encryption(read_data(fd_in), fd_out) : decryption(read_data(fd_in), fd_out);
-}
-*/
-int		main(int argc, char **argv)
-{
-	if (argc == 1)
-		ft_putstr("usage: ft_ssl command [command opts] [command args]\n");
-	else
-	{
-		if (ft_strcmp(argv[1], "base64") == 0)
-			base64(argc, argv);
-		else if (ft_strcmp(argv[1], "des") == 0)
-			des(argv);
-		else if (ft_strcmp(argv[1], "des-cbc") == 0)
-			des_cbc(argv);
-		else
-		{
-			ft_putstr("ft_ssl: Error: '");
-			ft_putstr(argv[1]);
-			ft_putstr("' is an invalid command.\n\nStandard commands:\n\n");
-			ft_putstr("Message Digest commmands:\n\nCipher commands:\nbase64\n");
-			ft_putstr("des\ndes-ecb\ndes-cbc\n");
-		}	
-	}
-	return (0);
 }
