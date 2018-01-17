@@ -6,17 +6,12 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/11 15:03:26 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/15 18:12:50 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/16 16:18:24 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl_des.h"
 #include <stdio.h> //delete me!!
-
-void	des(char **argv)
-{
-	(void)argv;
-}
 
 void	des_cbc(char **argv)
 {
@@ -159,9 +154,9 @@ int		main(int argc, char **argv)
 	else
 	{
 		if (ft_strcmp(argv[1], "base64") == 0)
-			base64(argc, argv);
+			base64(argc, argv, 2);
 		else if (ft_strcmp(argv[1], "des") == 0)
-			des(argv);
+			des(argc, argv);
 		else if (ft_strcmp(argv[1], "des-cbc") == 0)
 			des_cbc(argv);
 		else

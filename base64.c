@@ -6,25 +6,24 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/15 17:18:40 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/15 18:12:41 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/16 16:15:31 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl_des.h"
 
-char gbase64[65] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-					'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-					'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
-					'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-					's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2',
-					'3','4', '5', '6', '7', '8', '9', '+', '/', '\0'};
+char g_b64[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+	'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+	'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+	'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+	's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2',
+	'3', '4', '5', '6', '7', '8', '9', '+', '/', '\0'};
 
-void	encryption(char *s, int fd_out)
+static void		encryption(char *s, int fd_out, char *group)
 {
 	int i;
 	int	j;
 	int value;
-	char group[5];
 
 	i = 0;
 	while (s[i] != '\0')
@@ -38,48 +37,60 @@ void	encryption(char *s, int fd_out)
 			group[++j] = '=';
 		while (j >= 0)
 		{
-			group[j] = (group[j] != '=') ? gbase64[value % 64] : group[j];
+			group[j] = (group[j] != '=') ? g_b64[value % 64] : group[j];
 			value /= 64;
 			j--;
 		}
 		ft_putstr_fd(group, fd_out);
-		ft_putstr_fd((i != 0 && i % 48 == 0 && group[0] && s[i]) ? "\n" : "", fd_out);
+		ft_putstr_fd((i != 0 && i % 48 == 0 && group[0] && s[i])
+				? "\n" : "", fd_out);
 	}
 	ft_putstr_fd((group[0]) ? "\n" : "", fd_out);
 }
 
-void	decryption(char *s, int fd_out)
+/*
+** val_idx[0] : value
+** val_idx[1] : index
+*/
+
+static void		decryption(char *s, int fd_out, char *group, int i)
 {
-	int i;
 	int	j;
-	int value;
-	char group[5];
-	int index;
+	int val_idx[2];
 	int abort;
 
-	i = 0;
 	abort = 0;
 	while (s[i] != '\0' && !abort && !(j = 0))
 	{
-		value = 0;
+		val_idx[0] = 0;
 		ft_bzero(group, 5);
-		while (s[i] != '\0' && j < 4 && !abort && !(index = 0))
+		while (s[i] != '\0' && j < 4 && !abort && !(val_idx[1] = 0))
 		{
 			i = (i != 0 && i % 64 == 0 && s[i] == '\n') ? i + 1 : i;
-			while (s[i] != '=' && index < 64 && gbase64[index] != s[i])
-				index++;
-			abort = (index == 64) ? 1 : 0;
-			value += ft_power(64, 4 - (++j)) * index;
-			i++;
+			while (s[i] != '=' && val_idx[1] < 64 && g_b64[val_idx[1]] != s[i])
+				val_idx[1]++;
+			abort = (++i && val_idx[1] == 64) ? 1 : 0;
+			val_idx[0] += ft_power(64, 4 - (++j)) * val_idx[1];
 		}
 		while (j-- >= 0)
 		{
-			group[j - 1] = value % 256;
-			(ft_haschar(gbase64, value % 256)) ? value /= 256 : exit(1);
+			group[j - 1] = val_idx[0] % 256;
+			(ft_haschar(g_b64, val_idx[0] % 256)) ? val_idx[0] /= 256 : exit(1);
 		}
 		ft_putstr_fd((!abort) ? group : "", fd_out);
 	}
 	ft_putstr_fd((!abort) ? "\n" : "", fd_out);
+}
+
+static void		processes(char *s, int fd_out, int encrypt)
+{
+	char	group[5];
+
+	ft_bzero(group, sizeof(group));
+	if (encrypt)
+		encryption(s, fd_out, group);
+	else
+		decryption(s, fd_out, group, 0);
 }
 
 /*
@@ -89,7 +100,7 @@ void	decryption(char *s, int fd_out)
 ** error [3] : invalid file error
 */
 
-void	option_file_error(char **argv, int i, int error)
+static void		option_file_error(char **argv, int i, int error)
 {
 	if (error == 0)
 	{
@@ -100,7 +111,7 @@ void	option_file_error(char **argv, int i, int error)
 	if (error == 1)
 	{
 		ft_putstr("missing file argument for ");
-		ft_putendl(argv[i -1]);
+		ft_putendl(argv[i - 1]);
 	}
 	if (error == 0 || error == 1 || error == 2)
 	{
@@ -118,14 +129,12 @@ void	option_file_error(char **argv, int i, int error)
 	exit(1);
 }
 
-void	base64(int argc, char **argv)
+static void		base64(int argc, char **argv, int i)
 {
-	int	i;
 	int fd_in;
 	int	fd_out;
 	int	encrypt;
 
-	i = 2;
 	fd_in = 0;
 	fd_out = 1;
 	encrypt = 1;
@@ -145,5 +154,5 @@ void	base64(int argc, char **argv)
 			exit(1);
 	}
 	(i < argc) ? option_file_error(argv, i, 2 * (argv[i][0] == '-')) : 0;
-	(encrypt) ? encryption(read_data(fd_in), fd_out) : decryption(read_data(fd_in), fd_out);
+	processes(read_data(fd_in), fd_out, encrypt);
 }
