@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/15 17:18:40 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/16 16:15:31 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/17 20:43:57 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ static void		option_file_error(char **argv, int i, int error)
 	exit(1);
 }
 
-static void		base64(int argc, char **argv, int i)
+void			base64(int argc, char **argv, int i)
 {
 	int fd_in;
 	int	fd_out;
