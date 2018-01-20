@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/18 11:39:01 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/18 19:51:24 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/19 19:22:49 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int		g_e[] = {32, 1, 2, 3, 4, 5,
 				24, 25, 26, 27, 28, 29,
 				28, 29, 30, 31, 32, 1};
 
-int		g_sbox[32][16] = {{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
+int		g_sbx[32][16] = {{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
 					{0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
 					{4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0},
 					{15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13},
@@ -64,62 +64,111 @@ int		g_sbox[32][16] = {{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
 					{7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8},
 					{2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11}};
 
-void	encryption(char *text, char *key, int fd_out, int encrypt)
+int		g_p[] = {16, 7, 20, 21,
+				29, 12, 28, 17,
+				1, 15, 23, 26,
+				5, 18, 31, 10,
+				2, 8, 24, 14,
+				32, 27, 3, 9,
+				19, 13, 30, 6,
+				22, 11, 4, 25};
+
+int		g_finalp[] = {40, 8, 48, 16, 56, 24, 64, 32,
+					39, 7, 47, 15, 55, 23, 63, 31,
+					38, 6, 46, 14, 54, 22, 62, 30,
+					37, 5, 45, 13, 53, 21, 61, 29,
+					36, 4, 44, 12, 52, 20, 60, 28,
+					35, 3, 43, 11, 51, 19, 59, 27,
+					34, 2, 42, 10, 50, 18, 58, 26,
+					33, 1, 41, 9, 49, 17, 57, 25};	
+
+unsigned long long		encode(unsigned long long l, unsigned long long r,
+										unsigned long long *subkeys, int i)
 {
-	(void)fd_out;
-	(void)encrypt;
-	unsigned long long	subkeys[16];
-	unsigned long long	s;
-	unsigned long long	l;
-	unsigned long long	r;
 	unsigned long long	tmp_l;
 	unsigned long long	tmp_box;
-	int					col;
-	int					row;
+	unsigned long long	tmp_subkey;
+	int					row_col[2];
+	int					j;
+	
+	while (i++ < 16)
+	{
+		tmp_l = l;
+		l = r;
+		r = permutate(r, g_e, 48, 32);
+		tmp_subkey = subkeys[i - 1] ^ r;
+		j = 8;
+		tmp_box = 0;
+		while (--j >= 0)
+		{
+			row_col[1] = (tmp_subkey % 64)	/ 2 % 16;
+			row_col[0] = (tmp_subkey % 64) / 32 * 2 + (tmp_subkey % 64) % 2;
+			tmp_box += g_sbx[row_col[0] + j * 4][row_col[1]]
+						* ft_power(16, 7 - j);
+			tmp_subkey /= 64;
+		}
+		r = permutate(tmp_box, g_p, 32, 32) ^ tmp_l;
+//		i++;
+	}
+	return (permutate(r * 4294967296 + l, g_finalp, 64, 64));
+}
+
+unsigned long long		decode(unsigned long long l, unsigned long long r,
+										unsigned long long *subkeys, int i)
+{
+	unsigned long long 	tmp_r;
+	unsigned long long	tmp_box;
+	unsigned long long	tmp_subkey;
+	int					row_col[2];
+	int					j;
+	
+	while (--i >= 0)
+	{
+		tmp_r = r;
+		r = l;
+		l = permutate(l, g_e, 48, 32);
+		tmp_subkey = subkeys[i] ^ l;
+		j = 8;
+		tmp_box = 0;
+		while (--j >= 0)
+		{
+			row_col[1] = (tmp_subkey % 64) / 2 % 16;
+			row_col[0] = (tmp_subkey % 64) / 32 * 2 + (tmp_subkey % 64) % 2;
+			tmp_box += g_sbx[row_col[0] + j * 4][row_col[1]]
+						* ft_power(16, 7 - j);
+			tmp_subkey /= 64;
+		}
+		l = permutate(tmp_box, g_p, 32, 32) ^ tmp_r;
+	}
+	return (permutate(l * 4294967296 + r, g_finalp, 64, 64));
+}
+
+void	encrypt_decrypt(char *text, char *key, int fd_out, int encrypt)
+{
+	unsigned long long	subkeys[16];
+	unsigned long long	s_blk;
 	int					i;
 	int					j;
 
 	i = 0;
-	s = 0;
 	get_permutate_subkeys(key, subkeys);
-	//need outer loop to process full message, right now only works with first 8 bytes
-	while (text[i] != '\0' && i < 8)
+	while (text[i] != '\0')
 	{
-		s = s * 256 + (unsigned char)text[i]; //2^8 = 256
-//		printf("text[i] is %u and s is %llu\n", (unsigned char)text[i], s);
-		i++;
+		j = 0;
+		s_blk = 0;
+		while (text[i] != '\0' && j++ < 8)
+			s_blk = s_blk * 256 + (unsigned char)text[i++]; //2^8 = 256
+		while (j++ < 8)
+			s_blk *= 256;
+		s_blk = permutate(s_blk, g_ip, 64, 64);
+		if (encrypt)
+			s_blk = encode(s_blk / 4294967296, s_blk % 4294967296, subkeys, 0); //2^32 = 4294967296
+		else
+			s_blk = decode(s_blk % 4294967296, s_blk / 4294967296, subkeys, 16);
+		j = 8;
+		while (--j >= 0)
+			ft_putchar_fd(s_blk / ft_power(256, j) % 256, fd_out);
 	}
-	while (i++ < 8)
-		s *= 256;
-	s = permutate(s, g_ip, 64, 64);
-	l = s / 4294967296; //2^32 = 4294967296
-	r = s % 4294967296;
-	printf("s is %llu, l is  %llu, r is %llu\n", s, l, r);
-	i = 0;
-	while (i < 16)
-		printf("subkey is %llu\n", subkeys[i++]);
-	tmp_l = l;
-	l = r;
-	r = permutate(r, g_e, 48, 32);
-	printf("r is now %llu\n", r);
-	subkeys[0] = subkeys[0] ^ r;
-	printf("the first subkey is now %llu\n", subkeys[0]);
-	i = 0;
-	j = 0;
-	tmp_box = 0;
-	while (i < 8)  //left off here!!!
-	{
-		printf("subkey mod 64 is %llu\n", subkeys[0] % 64);
-		col = (subkeys[0] % 64)	/ 2 % 16;
-		row = (subkeys[0] % 64) / 16 + (subkeys[0] % 64) % 2;
-		printf("tmp_box is %llu and about to add %lld\n", tmp_box, g_sbox[row + j * 4][col] * ft_power(16, i));
-		tmp_box = tmp_box + g_sbox[row + j * 4][col] * ft_power(16, i);
-		printf("row is %d col is %d and g_sbox there is %d\n", row, col, g_sbox[row + j * 4][col]);
-		subkeys[0] /= 64;
-		i++;
-	}
-	subkeys[0] = tmp_box;
-	printf("subkeys[0] after s box is now %llu\n", subkeys[0]);
 }
 
 void	option_file_error(char **argv, int i, int error)
@@ -163,5 +212,6 @@ void	des_ecb(int argc, char **argv, int i)
 	while (i < argc && (ft_strcmp(argv[i], "-e") == 0 || ft_strcmp(argv[i], "-d") == 0))
 		encrypt = (ft_strcmp(argv[i++], "-d") == 0) ? 0 : 1;
 // -a, -i, -o flags (can be before -k flag as well?)
-	encryption(text, key, fd_out, encrypt);
+	encrypt_decrypt(text, key, fd_out, encrypt);
+//	(encrypt) ? encryption(text, key, fd_out) : decryption(text, key, fd_out);
 }
