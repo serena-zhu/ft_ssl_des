@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/15 17:18:40 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/19 16:09:10 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/19 22:04:24 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,20 +19,20 @@ char g_b64[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
 	's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2',
 	'3', '4', '5', '6', '7', '8', '9', '+', '/', '\0'};
 
-static void		encryption(char *s, int fd_out, char *group)
+void			encryption(char *s, int fd_out, char *group)
 {
-	int i;
-	int	j;
-	int value;
+	int 			i;
+	int				j;
+	int	value;
 
 	i = 0;
 	while (s[i] != '\0')
 	{
 		j = 0;
 		value = 0;
-		ft_bzero(group, 5);
+		ft_bzero(group, sizeof(group));
 		while (s[i] != '\0' && j < 3)
-			value += ft_power(256, 3 - (++j)) * s[i++];
+			value += (ft_power(256, 3 - (++j)) * (unsigned char)s[i++]);
 		while (j < 3)
 			group[++j] = '=';
 		while (j >= 0)
@@ -63,7 +63,7 @@ static void		decryption(char *s, int fd_out, char *group, int i)
 	while (s[i] != '\0' && !abort && !(j = 0))
 	{
 		val_idx[0] = 0;
-		ft_bzero(group, 5);
+		ft_bzero(group, sizeof(group));
 		while (s[i] != '\0' && j < 4 && !abort && !(val_idx[1] = 0))
 		{
 			i = (i != 0 && i % 64 == 0 && s[i] == '\n') ? i + 1 : i;
@@ -86,7 +86,7 @@ static void		processes(char *s, int fd_out, int encrypt)
 {
 	char	group[5];
 
-	ft_bzero(group, sizeof(group));
+//	ft_bzero(group, sizeof(group));
 	if (encrypt)
 		encryption(s, fd_out, group);
 	else

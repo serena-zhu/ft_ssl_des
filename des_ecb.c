@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/18 11:39:01 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/19 19:39:10 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/19 22:16:56 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,8 +142,29 @@ static unsigned long long		decode(unsigned long long l,
 	return (permutate(l * 4294967296 + r, g_finalp, 64, 64));
 }
 
+void							process_text(unsigned long long s_blk, int fd_out, int base64)
+{
+	char	blk[9];
+	char	group[5];
+	int		j;
+
+	ft_bzero(blk, sizeof(blk));
+//	ft_bzero(group, sizeof(group));
+	j = 8;
+	while (--j >= 0)
+		blk[7 - j] = s_blk / ft_power(256, j) % 256;
+	if (base64) //what about decrypt with -a flag?
+		encryption(blk, fd_out, group);
+/*	if (base64 && encrypt)
+		encryption(blk, fd_out, group);
+	else if (base64 && !encrypt)
+		decryption(blk, fd_out, group, 0);
+*/	else
+		ft_putstr_fd(blk, fd_out);
+}
+
 static void						encrypt_decrypt(char *text, char *key,
-													int fd_out, int encrypt)
+										int fd_out, int encrypt, int base64)
 {
 	unsigned long long	subkeys[16];
 	unsigned long long	s_blk;
@@ -165,9 +186,10 @@ static void						encrypt_decrypt(char *text, char *key,
 			s_blk = encode(s_blk / 4294967296, s_blk % 4294967296, subkeys, 0); //2^32 = 4294967296
 		else
 			s_blk = decode(s_blk % 4294967296, s_blk / 4294967296, subkeys, 16);
-		j = 8;
-		while (--j >= 0)
-			ft_putchar_fd(s_blk / ft_power(256, j) % 256, fd_out);
+		process_text(s_blk, fd_out, base64);
+//		j = 8;
+//		while (--j >= 0)
+//			ft_putchar_fd(s_blk / ft_power(256, j) % 256, fd_out);
 	}
 }
 
@@ -195,10 +217,12 @@ void							des_ecb(int argc, char **argv, int i)
 	int		encrypt;
 	char	*key;
 	char	*text;
+	int		base64;
 
 	fd_in = 0;
 	fd_out = 1;
 	encrypt = 1;
+	base64 = 0;
 	text = read_data(0);
 /*	if (i >= argc)
 	{
@@ -208,10 +232,13 @@ void							des_ecb(int argc, char **argv, int i)
 */	while (i < argc && (ft_strcmp(argv[i], "-e") == 0 || ft_strcmp(argv[i], "-d") == 0))
 		encrypt = (ft_strcmp(argv[i++], "-d") == 0) ? 0 : 1;
 	if (i < argc && ft_strcmp(argv[i], "-k") == 0)
-		(++i < argc) ? key = argv[i] : option_file_error(argv, i, 1);
+		(++i < argc) ? key = argv[i++] : option_file_error(argv, i, 1);
 	while (i < argc && (ft_strcmp(argv[i], "-e") == 0 || ft_strcmp(argv[i], "-d") == 0))
 		encrypt = (ft_strcmp(argv[i++], "-d") == 0) ? 0 : 1;
+	while (i < argc && ft_strcmp(argv[i++], "-a") == 0)
+		base64 = 1;
+	//if base64 and decrypt, then must decrypt put txt through decryption function of base64
 // -a, -i, -o flags (can be before -k flag as well?)
-	encrypt_decrypt(text, key, fd_out, encrypt);
+	encrypt_decrypt(text, key, fd_out, encrypt, base64);
 //	(encrypt) ? encryption(text, key, fd_out) : decryption(text, key, fd_out);
 }
