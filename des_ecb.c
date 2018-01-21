@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/18 11:39:01 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/19 22:16:56 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/20 19:22:50 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ static unsigned long long		decode(unsigned long long l,
 	return (permutate(l * 4294967296 + r, g_finalp, 64, 64));
 }
 
-void							process_text(unsigned long long s_blk, int fd_out, int base64)
+void							process_text(unsigned long long s_blk, t_opt opt)
 {
 	char	blk[9];
 	char	group[5];
@@ -153,18 +153,17 @@ void							process_text(unsigned long long s_blk, int fd_out, int base64)
 	j = 8;
 	while (--j >= 0)
 		blk[7 - j] = s_blk / ft_power(256, j) % 256;
-	if (base64) //what about decrypt with -a flag?
-		encryption(blk, fd_out, group);
+	if (opt.base64) //what about decrypt with -a flag?
+		b64_encrypt(blk, opt.fd_out, group);
 /*	if (base64 && encrypt)
 		encryption(blk, fd_out, group);
 	else if (base64 && !encrypt)
 		decryption(blk, fd_out, group, 0);
 */	else
-		ft_putstr_fd(blk, fd_out);
+		ft_putstr_fd(blk, opt.fd_out);
 }
 
-static void						encrypt_decrypt(char *text, char *key,
-										int fd_out, int encrypt, int base64)
+static void						encrypt_decrypt(char *text, char *key, t_opt opt)
 {
 	unsigned long long	subkeys[16];
 	unsigned long long	s_blk;
@@ -182,63 +181,29 @@ static void						encrypt_decrypt(char *text, char *key,
 		while (j++ < 8)
 			s_blk *= 256;
 		s_blk = permutate(s_blk, g_ip, 64, 64);
-		if (encrypt)
+		if (opt.encrypt)
 			s_blk = encode(s_blk / 4294967296, s_blk % 4294967296, subkeys, 0); //2^32 = 4294967296
 		else
 			s_blk = decode(s_blk % 4294967296, s_blk / 4294967296, subkeys, 16);
-		process_text(s_blk, fd_out, base64);
+		process_text(s_blk, opt);
 //		j = 8;
 //		while (--j >= 0)
 //			ft_putchar_fd(s_blk / ft_power(256, j) % 256, fd_out);
 	}
 }
 
-static void						option_file_error(char **argv, int i, int error)
+void							des_ecb(int argc, char **argv)
 {
-	if (error == 1)
-	{
-		ft_putstr("missing key argument for ");
-		ft_putendl(argv[i - 1]);
-	}
-	if (error == 1)
-	{
-		ft_putstr("usage: enc -ciphername [-base64]\n");  //add to this?
-		ft_putstr("-d            Decrypt the input data\n");
-		ft_putstr("-e            Encrypt the input data (default)\n");
-		ft_putstr("-i            Input file to read from (default stdin)\n");
-		ft_putstr("-o            Output file to write to (default stdout)\n");
-	}
-}
-
-void							des_ecb(int argc, char **argv, int i)
-{
-	int		fd_in;
-	int		fd_out;
-	int		encrypt;
 	char	*key;
 	char	*text;
-	int		base64;
+	t_opt	opt;
 
-	fd_in = 0;
-	fd_out = 1;
-	encrypt = 1;
-	base64 = 0;
-	text = read_data(0);
-/*	if (i >= argc)
-	{
-		ft_putstr("enter des key in hex: ");
-		key = read_data(0);
-	}
-*/	while (i < argc && (ft_strcmp(argv[i], "-e") == 0 || ft_strcmp(argv[i], "-d") == 0))
-		encrypt = (ft_strcmp(argv[i++], "-d") == 0) ? 0 : 1;
-	if (i < argc && ft_strcmp(argv[i], "-k") == 0)
-		(++i < argc) ? key = argv[i++] : option_file_error(argv, i, 1);
-	while (i < argc && (ft_strcmp(argv[i], "-e") == 0 || ft_strcmp(argv[i], "-d") == 0))
-		encrypt = (ft_strcmp(argv[i++], "-d") == 0) ? 0 : 1;
-	while (i < argc && ft_strcmp(argv[i++], "-a") == 0)
-		base64 = 1;
-	//if base64 and decrypt, then must decrypt put txt through decryption function of base64
-// -a, -i, -o flags (can be before -k flag as well?)
-	encrypt_decrypt(text, key, fd_out, encrypt, base64);
-//	(encrypt) ? encryption(text, key, fd_out) : decryption(text, key, fd_out);
+	key = NULL;
+	initialize_opt(&opt);
+	if (argc <= 2)
+		key = getpass("enter des key in hex: ");
+	key = populate_data(argc, argv, key, &opt);
+	text = read_data(opt.fd_in);
+	//still need -a and -nopad flags
+	encrypt_decrypt(text, key, opt);
 }

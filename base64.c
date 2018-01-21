@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/15 17:18:40 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/19 22:04:24 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/20 19:13:40 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,11 @@ char g_b64[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
 	's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2',
 	'3', '4', '5', '6', '7', '8', '9', '+', '/', '\0'};
 
-void			encryption(char *s, int fd_out, char *group)
+void			b64_encrypt(char *s, int fd_out, char *group)
 {
-	int 			i;
-	int				j;
-	int	value;
+	int		i;
+	int		j;
+	int		value;
 
 	i = 0;
 	while (s[i] != '\0')
@@ -53,7 +53,7 @@ void			encryption(char *s, int fd_out, char *group)
 ** val_idx[1] : index
 */
 
-static void		decryption(char *s, int fd_out, char *group, int i)
+static void		b64_decrypt(char *s, int fd_out, char *group, int i)
 {
 	int	j;
 	int val_idx[2];
@@ -82,77 +82,23 @@ static void		decryption(char *s, int fd_out, char *group, int i)
 	ft_putstr_fd((!abort) ? "\n" : "", fd_out);
 }
 
-static void		processes(char *s, int fd_out, int encrypt)
-{
-	char	group[5];
-
-//	ft_bzero(group, sizeof(group));
-	if (encrypt)
-		encryption(s, fd_out, group);
-	else
-		decryption(s, fd_out, group, 0);
-}
-
 /*
-** error [0] : unknown option provided && usuage error
-** error [1] : missing file argument for -i or -o
-** error [2] : usuage error
-** error [3] : invalid file error
+** key not used for this cipher, but will not throw error if user provides one
 */
 
-static void		option_file_error(char **argv, int i, int error)
+void			base64(int argc, char **argv)
 {
-	if (error == 0)
-	{
-		ft_putstr("unknown option '");
-		ft_putstr(argv[i]);
-		ft_putstr("'\n");
-	}
-	if (error == 1)
-	{
-		ft_putstr("missing file argument for ");
-		ft_putendl(argv[i - 1]);
-	}
-	if (error == 0 || error == 1 || error == 2)
-	{
-		ft_putstr("usage: enc -ciphername [-base64]\n");  //add to this?
-		ft_putstr("-d              Decrypt the input data\n");
-		ft_putstr("-e              Encrypt the input data (default)\n");
-		ft_putstr("-i              Input file to read from (default stdin)\n");
-		ft_putstr("-o              Output file to write to (default stdout)\n");
-	}
-	if (error == 3)
-	{
-		ft_putstr(argv[i]);
-		ft_putstr(": No such file or directory\n");
-	}
-	exit(1);
-}
+	t_opt	opt;
+	char	*s;
+	char	*key;
+	char	group[5];
 
-void			base64(int argc, char **argv, int i)
-{
-	int fd_in;
-	int	fd_out;
-	int	encrypt;
-
-	fd_in = 0;
-	fd_out = 1;
-	encrypt = 1;
-	while (i < argc && (ft_strcmp(argv[i], "-e") == 0
-				|| ft_strcmp(argv[i], "-d") == 0))
-		encrypt = (ft_strcmp(argv[i++], "-d") == 0) ? 0 : 1;
-	if (i < argc && ft_strcmp(argv[i], "-i") == 0 && ++i)
-	{
-		(i >= argc) ? option_file_error(argv, i, 1) : 0;
-		if ((fd_in = open(argv[i++], O_RDONLY)) < 0)
-			(i - 1 < argc) ? option_file_error(argv, i - 1, 3) : exit(1);
-	}
-	if (i < argc && ft_strcmp(argv[i], "-o") == 0 && ++i)
-	{
-		(i >= argc) ? option_file_error(argv, i, 1) : 0;
-		if ((fd_out = open(argv[i++], O_CREAT | O_TRUNC | O_WRONLY, 0666)) < 0)
-			exit(1);
-	}
-	(i < argc) ? option_file_error(argv, i, 2 * (argv[i][0] == '-')) : 0;
-	processes(read_data(fd_in), fd_out, encrypt);
+	key = NULL;
+	initialize_opt(&opt);
+	key = populate_data(argc, argv, key, &opt);
+	s = read_data(opt.fd_in);
+	if (opt.encrypt)
+		b64_encrypt(s, opt.fd_out, group);
+	else
+		b64_decrypt(s, opt.fd_out, group, 0);
 }
