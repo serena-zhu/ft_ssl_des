@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/18 11:39:01 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/20 19:22:50 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/22 19:36:01 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int		g_sbx[32][16] = {{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
 	{3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5},
 	{0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15},
 	{13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9},
-	{10, 0, 19, 14, 6, 3, 15, 5, 1, 13, 12, 7, 11, 4, 2, 8},
+	{10, 0, 9, 14, 6, 3, 15, 5, 1, 13, 12, 7, 11, 4, 2, 8},
 	{13, 7, 0, 9, 3, 4, 6, 10, 2, 8, 5, 14, 12, 11, 15, 1},
 	{13, 6, 4, 9, 8, 15, 3, 0, 11, 1, 2, 12, 5, 10, 14, 7},
 	{1, 10, 13, 0, 6, 9, 8, 7, 4, 15, 14, 3, 11, 5, 2, 12},
@@ -81,6 +81,13 @@ int		g_finalp[] = {40, 8, 48, 16, 56, 24, 64, 32,
 	35, 3, 43, 11, 51, 19, 59, 27,
 	34, 2, 42, 10, 50, 18, 58, 26,
 	33, 1, 41, 9, 49, 17, 57, 25};
+
+char g_b64_dup[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+	'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+	'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+	'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+	's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2',
+	'3', '4', '5', '6', '7', '8', '9', '+', '/', '\0'};
 
 static unsigned long long		encode(unsigned long long l,
 					unsigned long long r, unsigned long long *subkeys, int i)
@@ -142,25 +149,55 @@ static unsigned long long		decode(unsigned long long l,
 	return (permutate(l * 4294967296 + r, g_finalp, 64, 64));
 }
 
-void							process_text(unsigned long long s_blk, t_opt opt)
+void							process_text(unsigned long long s_blk, t_opt *opt, int padded)
 {
 	char	blk[9];
 	char	group[5];
 	int		j;
+//	int		padding;
 
 	ft_bzero(blk, sizeof(blk));
-//	ft_bzero(group, sizeof(group));
-	j = 8;
-	while (--j >= 0)
-		blk[7 - j] = s_blk / ft_power(256, j) % 256;
-	if (opt.base64) //what about decrypt with -a flag?
-		b64_encrypt(blk, opt.fd_out, group);
-/*	if (base64 && encrypt)
-		encryption(blk, fd_out, group);
-	else if (base64 && !encrypt)
-		decryption(blk, fd_out, group, 0);
-*/	else
-		ft_putstr_fd(blk, opt.fd_out);
+	printf("s_blk is %llu\n", s_blk);
+	if (!opt->encrypt)
+	{
+		j = s_blk % 256;
+		printf("here, j is %d, ft_power(256, 8) is %lld\n", j, (unsigned long long)ft_power(256, 8));
+		if (j > 0 && j <= 8)
+		{
+//			if (ft_power(256, j) == 0) //need to figure out why 258^8 is 0 -- maybe change ft_power to unsigned long long
+//				s_blk = 0;
+			if (j == 8)
+				s_blk = 0; 
+			else
+				s_blk = s_blk / ft_power(256, j) * ft_power(256, j);
+		}
+		printf("s_blk is now 2 %llu\n", s_blk);
+/*		padding = s_blk % 256;
+//		printf("padding is %d and s_blk is %llu\n", padding, s_blk);
+		if (padding >= 0 && padding <= 8 && (j = 1))
+		{
+			while ((s_blk / ft_power(256, j + 1) % 256) == padding)
+				j++;
+			printf("j is %d\n", j);
+			if (j == padding - 1 && j > 0 && j <= 8)
+				s_blk = s_blk / ft_power(256, j + 1) * ft_power(256, j + 1);
+		}
+*/	}
+	if (s_blk != 0)
+	{
+		printf("s_blk is now %llu\n", s_blk);
+		j = 8;
+		while (--j >= 0)
+			blk[7 - j] = s_blk / ft_power(256, j) % 256;
+		if (opt->encrypt && opt->base64) //what about decrypt with -a flag?
+		{
+			opt->b64_s = ft_strjoin(opt->b64_s, blk);	
+			if (padded)	
+				b64_encrypt(opt->b64_s, opt->fd_out, group);
+		}
+		else
+			ft_putstr_fd(blk, opt->fd_out);
+	}
 }
 
 static void						encrypt_decrypt(char *text, char *key, t_opt opt)
@@ -169,28 +206,74 @@ static void						encrypt_decrypt(char *text, char *key, t_opt opt)
 	unsigned long long	s_blk;
 	int					i;
 	int					j;
+	int					padded;
 
 	i = 0;
+	padded = 0;
 	get_permutate_subkeys(key, subkeys);
-	while (text[i] != '\0')
+	while (text[i] != '\0' || (opt.encrypt && padded == 0)) //is this okay?
 	{
 		j = 0;
 		s_blk = 0;
 		while (text[i] != '\0' && j++ < 8)
+		{
 			s_blk = s_blk * 256 + (unsigned char)text[i++];
-		while (j++ < 8)
-			s_blk *= 256;
+			printf("text[i] is %x\n", text[i - 1]);
+		}
+		if (text[i] == '\0' && j < 8)
+		{
+			padded = 8 - j;
+			while (j++ < 8)
+				s_blk = s_blk * 256 + padded;
+		}
 		s_blk = permutate(s_blk, g_ip, 64, 64);
 		if (opt.encrypt)
 			s_blk = encode(s_blk / 4294967296, s_blk % 4294967296, subkeys, 0); //2^32 = 4294967296
 		else
 			s_blk = decode(s_blk % 4294967296, s_blk / 4294967296, subkeys, 16);
-		process_text(s_blk, opt);
-//		j = 8;
-//		while (--j >= 0)
-//			ft_putchar_fd(s_blk / ft_power(256, j) % 256, fd_out);
+		process_text(s_blk, &opt, padded);
+		printf("i is %d and text[i] is %c and this should be true %d\n", i, text[i], text[i] == '\0');
 	}
 }
+
+static char		*decrypt_b64(char *s, t_opt *opt)
+{
+	int i;
+	int	j;
+	int val_idx[2];
+	int abort;
+	char group[5];
+
+	i = 0;
+	abort = 0;
+	while (s[i] != '\0' && !abort && !(j = 0))
+	{
+		val_idx[0] = 0;
+		ft_bzero(group, sizeof(group));
+		while (s[i] != '\0' && j < 4 && !abort && !(val_idx[1] = 0))
+		{
+			i = (i != 0 && i % 64 == 0 && s[i] == '\n') ? i + 1 : i;
+			while (s[i] != '=' && val_idx[1] < 64 && g_b64_dup[val_idx[1]] != s[i])
+				val_idx[1]++;
+			abort = (++i && val_idx[1] == 64) ? 1 : 0;
+			val_idx[0] += ft_power(64, 4 - (++j)) * val_idx[1];
+		}
+		while (j-- >= 0)
+		{
+			group[j - 1] = val_idx[0] % 256;
+			(ft_haschar(g_b64_dup, val_idx[0] % 256)) ? val_idx[0] /= 256 : exit(1);
+		}
+//		ft_putstr_fd((!abort) ? group : "", fd_out);
+		opt->b64_s = (!abort) ? ft_strjoin(opt->b64_s, group) : NULL;
+	}
+//	ft_putstr_fd((!abort) ? "\n" : "", fd_out);
+	if (!(opt->b64_s))
+		exit(1);
+	return (opt->b64_s);
+}
+
+
+//need to check for leaks!!!
 
 void							des_ecb(int argc, char **argv)
 {
@@ -202,8 +285,10 @@ void							des_ecb(int argc, char **argv)
 	initialize_opt(&opt);
 	if (argc <= 2)
 		key = getpass("enter des key in hex: ");
-	key = populate_data(argc, argv, key, &opt);
+	key = populate_data(argc, argv, key, &opt); //what if key is not the right length?!!
 	text = read_data(opt.fd_in);
-	//still need -a and -nopad flags
+	if (opt.base64 && !opt.encrypt)
+		text = decrypt_b64(text, &opt);
+	//still need -a and flags
 	encrypt_decrypt(text, key, opt);
 }

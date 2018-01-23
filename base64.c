@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/15 17:18:40 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/20 19:13:40 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/22 19:10:47 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void			b64_encrypt(char *s, int fd_out, char *group)
 			j--;
 		}
 		ft_putstr_fd(group, fd_out);
-		ft_putstr_fd((i != 0 && i % 48 == 0 && group[0] && s[i])
+		ft_putstr_fd((i != 0 && i % 48 == 0 && group[0] && s[i])		//dont need this step if coming from des-ecb?
 				? "\n" : "", fd_out);
 	}
 	ft_putstr_fd((group[0]) ? "\n" : "", fd_out);

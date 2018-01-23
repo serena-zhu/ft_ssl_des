@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/11 15:15:10 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/20 19:18:13 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/22 18:45:15 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ typedef struct		s_opt
 {
 	int				encrypt;
 	int				base64;
-	int				nopad;
+	char			*b64_s;
+//	int				nopad;
 	int				fd_in;
 	int				fd_out;
 }					t_opt;
