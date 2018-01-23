@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/20 17:27:33 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/22 19:36:07 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/23 11:58:34 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,12 @@
 
 void				initialize_opt(t_opt *opt)
 {
+	char *tmp;
+
 	opt->encrypt = 1;
 	opt->base64 = 0;
-	opt->b64_s = ft_strnew(4);;
-//	opt->nopad = 0;
+	tmp = ft_strnew(4);
+	opt->b64_s = tmp;
 	opt->fd_in = 0;
 	opt->fd_out = 1;
 }
@@ -52,8 +54,6 @@ char				*populate_data(int argc, char **argv, char *key, t_opt *opt)
 			populate_i_o(argc, argv, ++j, opt);
 		else if (ft_strcmp(argv[j], "-k") == 0 && ++j)
 			(j < argc) ? key = argv[j] : errors(argv, j, 2);
-//		else if (ft_strcmp(argv[j], "-nopad") == 0)
-//			opt->nopad = 1;
 		else
 			errors(argv, j, 3 * (argv[j][0] == '-'));
 		j++;

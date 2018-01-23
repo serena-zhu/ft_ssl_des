@@ -6,16 +6,11 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/11 15:03:26 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/22 19:34:00 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/23 11:49:55 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl_des.h"
-
-void	des_cbc(char **argv)
-{
-	(void)argv;
-}
 
 int		main(int argc, char **argv)
 {
@@ -29,7 +24,7 @@ int		main(int argc, char **argv)
 										|| ft_strcmp(argv[1], "des-ecb") == 0)
 			des_ecb(argc, argv);
 		else if (ft_strcmp(argv[1], "des-cbc") == 0)
-			des_cbc(argv);
+			des_cbc(argc, argv);
 		else
 		{
 			ft_putstr("ft_ssl: Error: '");

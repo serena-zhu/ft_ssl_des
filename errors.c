@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/20 16:38:09 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/20 19:25:42 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/23 12:14:10 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,15 @@
 
 void		usage_error(void)
 {
-	ft_putstr("usage: enc -ciphername [-ade] [-base64] [-i file] [-k key] ");
-	ft_putstr("[-nopad] [-o file]\n\n");
+	ft_putstr("usage: enc -ciphername [-ade] [-base64] [-i file] [-v IV] ");
+	ft_putstr("[-k key] [-o file]\n\n");
 	ft_putstr("-a          Process base64 encoding/decoding (alias -base64)\n");
 	ft_putstr("-d          Decrypt the input data\n");
 	ft_putstr("-e          Encrypt the input data (default)\n");
 	ft_putstr("-i          Input file to read from (default stdin)\n");
 	ft_putstr("-k          Key to use, specified as a hexidecimal string\n");
-	ft_putstr("-nopad      Disable standard block padding\n");
-	ft_putstr("-o          Output file to write to (default stdout)\n\n");
+	ft_putstr("-o          Output file to write to (default stdout)\n");
+	ft_putstr("-v          IV to use, specified as a hexidecimal string\n\n");
 	ft_putstr("Valid cipher values:\n\n");
 	ft_putstr("-des\n-des-cbc\n-des-ecb\n\n");
 }
