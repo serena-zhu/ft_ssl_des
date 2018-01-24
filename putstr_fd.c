@@ -1,38 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strdup.c                                        :+:      :+:    :+:   */
+/*   putstr_fd.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/11/01 21:46:39 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/23 16:40:06 by yazhu            ###   ########.fr       */
+/*   Created: 2017/11/29 12:58:37 by yazhu             #+#    #+#             */
+/*   Updated: 2018/01/23 20:38:36 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "ft_ssl_des.h"
 
-char	*ft_strdup(const char *s1)
+void	putstr_fd(unsigned char const *s, int fd)
 {
-	int		len;
-	char	*ptr;
-
-	len = 0;
-	while (s1[len] != '\0')
+	if (s)
 	{
-		len++;
+		write(fd, s, strlen2(s));
 	}
-	ptr = (char *)malloc((len + 1) * sizeof(*ptr));
-	if (ptr)
-	{
-		len = 0;
-		while (s1[len] != '\0')
-		{
-			ptr[len] = s1[len];
-			len++;
-		}
-		ptr[len] = '\0';
-		return (ptr);
-	}
-	return (NULL);
 }

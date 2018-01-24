@@ -6,30 +6,34 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/15 17:10:42 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/23 09:57:07 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/23 20:52:21 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl_des.h"
 
-char	*read_data(int fd)
+unsigned char	*read_data(t_opt *opt)
 {
 	int		ret;
-	char	buf[4096];
-	char	*data;
-	char	*tmp;
+	int		read_count;
+	unsigned char	buf[BUFF_SIZE + 1];
+	unsigned char	*data;
+	unsigned char	*tmp;
 
 	ret = 0;
-	ft_bzero(buf, sizeof(buf));
-	data = ft_strnew(sizeof(buf));
-	while ((ret = read(fd, buf, sizeof(buf) - 1)))
+	ft_bzero(buf, BUFF_SIZE + 1);
+	data = strnew(BUFF_SIZE + 1);
+	read_count = 0;
+	while ((ret = read(opt->fd_in, buf, BUFF_SIZE)))
 	{
-		tmp = ft_strdup(data);
-		data = ft_strjoin(tmp, buf);
+		tmp = strdup2(data);
+		data = strljoin(tmp, buf, (size_t)(BUFF_SIZE * read_count), ret);
+		read_count++;
+		opt->len += ret;
 		free(tmp);
-		ft_bzero(buf, sizeof(buf));
+		ft_bzero(buf, BUFF_SIZE);
 	}
-	if (fd > 0)
-		close(fd);
+	if (opt->fd_in > 0)
+		close(opt->fd_in);
 	return (data);
 }

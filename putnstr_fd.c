@@ -1,38 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strdup.c                                        :+:      :+:    :+:   */
+/*   putnstr_fd.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/11/01 21:46:39 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/23 16:40:06 by yazhu            ###   ########.fr       */
+/*   Created: 2018/01/23 19:04:15 by yazhu             #+#    #+#             */
+/*   Updated: 2018/01/23 20:31:25 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "ft_ssl_des.h"
 
-char	*ft_strdup(const char *s1)
+/*
+**	Modified version of ft_putstr_fd where number of bytes to be printed is
+**  specified so that '\0' in between or at the end can be printed as desired
+*/
+
+void	putnstr_fd(unsigned char const *s, int fd, int len)
 {
-	int		len;
-	char	*ptr;
-
-	len = 0;
-	while (s1[len] != '\0')
+	int i;
+	
+	if (s)
 	{
-		len++;
+		i = 0;
+		while (i < len)
+			write(fd, &s[i++], 1);
 	}
-	ptr = (char *)malloc((len + 1) * sizeof(*ptr));
-	if (ptr)
-	{
-		len = 0;
-		while (s1[len] != '\0')
-		{
-			ptr[len] = s1[len];
-			len++;
-		}
-		ptr[len] = '\0';
-		return (ptr);
-	}
-	return (NULL);
 }

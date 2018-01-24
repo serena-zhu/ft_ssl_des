@@ -6,12 +6,12 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/15 17:18:40 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/23 11:07:49 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/23 22:11:33 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl_des.h"
-
+#include <stdio.h> //delete me!!
 char g_b64[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
 	'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
 	'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
@@ -19,28 +19,28 @@ char g_b64[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
 	's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2',
 	'3', '4', '5', '6', '7', '8', '9', '+', '/', '\0'};
 
-void		join_b64_str(t_opt *opt, char *str)
+void		join_b64_str(t_opt *opt, unsigned char *str)
 {
-	char *tmp;
+	unsigned char *tmp;
 
 	tmp = opt->b64_s;
-	opt->b64_s = ft_strjoin(opt->b64_s, str);
+	opt->b64_s = strljoin(opt->b64_s, str, 0, strlen2(str));
 	free(tmp);
 }
 
-void		b64_encrypt(char *s, t_opt *opt, int j)
+void		b64_encrypt(unsigned char *s, t_opt *opt, int j)
 {
 	int		i;
 	int		value;
-	char	group[4];
+	unsigned char	group[4];
 
 	i = 0;
-	while (s[i] != '\0')
+	while (i < opt->len)
 	{
 		j = 0;
 		value = 0;
 		ft_bzero(group, 4);
-		while (s[i] != '\0' && j < 3)
+		while (i < opt->len && j < 3)
 			value += (ft_power(256, 3 - (++j)) * (unsigned char)s[i++]);
 		while (j < 3)
 			group[++j] = '=';
@@ -52,9 +52,9 @@ void		b64_encrypt(char *s, t_opt *opt, int j)
 		}
 		join_b64_str(opt, group);
 		(i != 0 && i % 48 == 0 && group[0] && s[i])
-											? join_b64_str(opt, "\n") : 0;
+								? join_b64_str(opt, (unsigned char *)"\n") : 0;
 	}
-	(group[0]) ? join_b64_str(opt, "\n") : 0;
+	(group[0]) ? join_b64_str(opt, (unsigned char *)"\n") : 0;
 }
 
 /*
@@ -62,33 +62,38 @@ void		b64_encrypt(char *s, t_opt *opt, int j)
 ** val_idx[1] : index
 */
 
-void		b64_decrypt(char *s, t_opt *opt, int i, int j)
+void		b64_decrypt(unsigned char *s, t_opt *opt, int i, int j)
 {
 	int		val_idx[2];
 	int		abort;
-	char	group[5];
+	unsigned char	group[5];
 
 	abort = 0;
-	while (s[i] != '\0' && !abort && !(j = 0))
+	while (i < opt->len && !abort && !(j = 0))
 	{
 		val_idx[0] = 0;
 		ft_bzero(group, 5);
-		while (s[i] != '\0' && j < 4 && !abort && !(val_idx[1] = 0))
+		while (i < opt->len && j < 4 && !abort && !(val_idx[1] = 0))
 		{
 			i = (i != 0 && i % 64 == 0 && s[i] == '\n') ? i + 1 : i;
 			while (s[i] != '=' && val_idx[1] < 64 && g_b64[val_idx[1]] != s[i])
 				val_idx[1]++;
 			abort = (++i && val_idx[1] == 64) ? 1 : 0;
+//			printf("s[i] is %c and index is %d\n", s[i - 1], val_idx[1]);
+//			printf("abort should be 0 %d and len is %d\n", abort, opt->len);
 			val_idx[0] += ft_power(64, 4 - (++j)) * val_idx[1];
+//			printf("val is %d\n", val_idx[0]);
 		}
 		while (j-- >= 0)
 		{
 			group[j - 1] = val_idx[0] % 256;
-			(ft_haschar(g_b64, val_idx[0] % 256)) ? val_idx[0] /= 256 : exit(1);
+//			printf("char is %c\n", val_idx[0] % 256);
+			val_idx[0] /= 256;
+//			(ft_haschar(g_b64, val_idx[0] % 256)) ? val_idx[0] /= 256 : exit(1);
 		}
 		(!abort) ? join_b64_str(opt, group) : 0;
 	}
-	(!abort) ? join_b64_str(opt, "\n") : 0;
+	(!abort) ? join_b64_str(opt, (unsigned char *)"\n") : 0;
 }
 
 /*
@@ -98,18 +103,16 @@ void		b64_decrypt(char *s, t_opt *opt, int i, int j)
 void		base64(int argc, char **argv)
 {
 	t_opt	opt;
-	char	*s;
-	char	*key;
+	unsigned char	*s;
 
-	key = NULL;
-	initialize_opt(&opt);
-	key = populate_data(argc, argv, key, &opt);
-	s = read_data(opt.fd_in);
+	initialize_opt(&opt, 0);
+	populate_data(argc, argv, &opt);
+	s = read_data(&opt);
 	if (opt.encrypt)
 		b64_encrypt(s, &opt, 0);
 	else
 		b64_decrypt(s, &opt, 0, 0);
-	ft_putstr_fd(opt.b64_s, opt.fd_out);
+	putstr_fd(opt.b64_s, opt.fd_out);
 	free(opt.b64_s);
 	free(s);
 }

@@ -1,38 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strdup.c                                        :+:      :+:    :+:   */
+/*   strcpy2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/11/01 21:46:39 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/23 16:40:06 by yazhu            ###   ########.fr       */
+/*   Created: 2017/10/30 19:22:06 by yazhu             #+#    #+#             */
+/*   Updated: 2018/01/23 20:56:33 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
-
-char	*ft_strdup(const char *s1)
+unsigned char	*strcpy2(unsigned char *dst, const char *src)
 {
-	int		len;
-	char	*ptr;
+	int i;
 
-	len = 0;
-	while (s1[len] != '\0')
+	i = 0;
+	while (src[i] != '\0')
 	{
-		len++;
+		dst[i] = src[i];
+		i++;
 	}
-	ptr = (char *)malloc((len + 1) * sizeof(*ptr));
-	if (ptr)
-	{
-		len = 0;
-		while (s1[len] != '\0')
-		{
-			ptr[len] = s1[len];
-			len++;
-		}
-		ptr[len] = '\0';
-		return (ptr);
-	}
-	return (NULL);
+	dst[i] = '\0';
+	return (dst);
 }

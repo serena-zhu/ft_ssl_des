@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/18 17:17:53 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/23 11:09:16 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/23 20:35:42 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int		g_pc2[] = {14, 17, 11, 24, 1, 5,
 	44, 49, 39, 56, 34, 53,
 	46, 42, 50, 36, 29, 32};
 
-static unsigned long long		permutate_key(char *key)
+static unsigned long long		permutate_key(unsigned char *key)
 {
 	unsigned long long	k;
 	int					i;
@@ -72,7 +72,7 @@ static int						rotate(unsigned int num, int i)
 	return (num);
 }
 
-void							get_permutate_subkeys(char *key,
+void							get_permutate_subkeys(unsigned char *key,
 												unsigned long long *subkeys)
 {
 	unsigned long long	k;

@@ -6,22 +6,27 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/20 17:27:33 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/23 11:58:34 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/23 20:30:59 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl_des.h"
 
-void				initialize_opt(t_opt *opt)
+void				initialize_opt(t_opt *opt, int des_cbc)
 {
-	char *tmp;
+	unsigned char *tmp;
 
+	opt->len = 0;
 	opt->encrypt = 1;
 	opt->base64 = 0;
-	tmp = ft_strnew(4);
+	tmp = strnew(4);
 	opt->b64_s = tmp;
 	opt->fd_in = 0;
 	opt->fd_out = 1;
+	opt->des_cbc = des_cbc;
+	opt->key = NULL;
+	opt->iv = NULL;
+	opt->offset = 0;
 }
 
 static void			populate_i_o(int argc, char **argv, int j, t_opt *opt)
@@ -37,7 +42,7 @@ static void			populate_i_o(int argc, char **argv, int j, t_opt *opt)
 		opt->fd_out = j;
 }
 
-char				*populate_data(int argc, char **argv, char *key, t_opt *opt)
+void				populate_data(int argc, char **argv, t_opt *opt)
 {
 	int j;
 
@@ -53,7 +58,7 @@ char				*populate_data(int argc, char **argv, char *key, t_opt *opt)
 		else if (ft_strcmp(argv[j], "-i") == 0 || ft_strcmp(argv[j], "-o") == 0)
 			populate_i_o(argc, argv, ++j, opt);
 		else if (ft_strcmp(argv[j], "-k") == 0 && ++j)
-			(j < argc) ? key = argv[j] : errors(argv, j, 2);
+			(j < argc) ? opt->key = (unsigned char *)argv[j] : errors(argv, j, 2);
 		else
 			errors(argv, j, 3 * (argv[j][0] == '-'));
 		j++;
@@ -61,5 +66,4 @@ char				*populate_data(int argc, char **argv, char *key, t_opt *opt)
 	if (opt->fd_out != 1 && (opt->fd_out = open(argv[opt->fd_out], O_CREAT
 											| O_TRUNC | O_WRONLY, 0666)) < 0)
 		exit(1);
-	return (key);
 }
