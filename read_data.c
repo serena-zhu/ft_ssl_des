@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/15 17:10:42 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/23 20:52:21 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/24 21:41:30 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,26 +14,29 @@
 
 unsigned char	*read_data(t_opt *opt)
 {
-	int		ret;
-	int		read_count;
+	int				ret;
+	int				read_count;
 	unsigned char	buf[BUFF_SIZE + 1];
 	unsigned char	*data;
 	unsigned char	*tmp;
 
 	ret = 0;
 	ft_bzero(buf, BUFF_SIZE + 1);
-	data = strnew(BUFF_SIZE + 1);
 	read_count = 0;
 	while ((ret = read(opt->fd_in, buf, BUFF_SIZE)))
 	{
-		tmp = strdup2(data);
-		data = strljoin(tmp, buf, (size_t)(BUFF_SIZE * read_count), ret);
-		read_count++;
-		opt->len += ret;
-		free(tmp);
+		tmp = data;
+		data = (unsigned char *)malloc(BUFF_SIZE * ++read_count
+													* sizeof(unsigned char));
+		if (read_count > 1)
+		{
+			ft_memcpy(data, tmp, BUFF_SIZE * read_count);
+			free(tmp);
+		}
+		ft_memcpy(data + BUFF_SIZE * (read_count - 1), buf, ret);
 		ft_bzero(buf, BUFF_SIZE);
+		opt->len += ret;
 	}
-	if (opt->fd_in > 0)
-		close(opt->fd_in);
+	(opt->fd_in > 0) ? close(opt->fd_in) : 0;
 	return (data);
 }

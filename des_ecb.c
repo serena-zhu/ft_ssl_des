@@ -6,12 +6,12 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/18 11:39:01 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/23 22:26:12 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/24 23:02:57 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl_des.h"
-#include <stdio.h> //delete me!!
+
 int		g_ip[] = {58, 50, 42, 34, 26, 18, 10, 2,
 	60, 52, 44, 36, 28, 20, 12, 4,
 	62, 54, 46, 38, 30, 22, 14, 6,
@@ -29,7 +29,6 @@ int		g_e[] = {32, 1, 2, 3, 4, 5,
 	20, 21, 22, 23, 24, 25,
 	24, 25, 26, 27, 28, 29,
 	28, 29, 30, 31, 32, 1};
-
 
 int		g_sbx[32][16] = {{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
 	{0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
@@ -155,7 +154,6 @@ static void						encrypt_decrypt(unsigned char *text, t_opt opt)
 	get_permutate_subkeys(opt.key, subkeys);
 	while ((i < opt.len || (opt.encrypt && padded == 0)) && !(j = 0))
 	{
-//		printf("len is %d\n", opt.len);
 		s_blk = 0;
 		while (i < opt.len && j++ < 8)
 			s_blk = s_blk * 256 + (unsigned char)text[i++];
@@ -164,12 +162,10 @@ static void						encrypt_decrypt(unsigned char *text, t_opt opt)
 			while (j++ < 8)
 				s_blk = s_blk * 256 + padded;
 		}
-//		printf("s_blk is %llu\n", s_blk);
 		s_blk = permutate(s_blk, g_ip, 64, 64);
 		s_blk = (opt.encrypt) ? encode(s_blk / 4294967296, s_blk % 4294967296,
 				subkeys, 0) : decode(s_blk % 4294967296, s_blk / 4294967296,
 				subkeys, 16);
-//		printf("final s_blk is %llu\n", s_blk);
 		des_ecb_processes(s_blk, &opt, padded);
 	}
 }
@@ -181,26 +177,23 @@ void							des_ecb(int argc, char **argv, int des_cbc)
 {
 	unsigned char	*text;
 	unsigned char	*tmp;
-	t_opt	opt;
+	t_opt			opt;
 
 	initialize_opt(&opt, des_cbc);
 	if (argc <= 2)
 		opt.key = (unsigned char *)getpass("enter des key in hex: ");
 	populate_data(argc, argv, &opt);
 	text = read_data(&opt);
+	if (opt.base64)
+		opt.b64_s = (unsigned char *)malloc(2 * opt.len * sizeof(*opt.b64_s));
 	if (opt.base64 && !opt.encrypt)
 	{
-//		printf("text is %s and len is %d\n", text, opt.len);
-		tmp = text;
 		b64_decrypt(text, &opt, 0, 0);
-		text = strdup2(opt.b64_s);
-		opt.len = strlen2(opt.b64_s);
-//		printf("len is %zu\n", strlen2(opt.b64_s));
-		ft_bzero(opt.b64_s, strlen2(opt.b64_s)); //set to opt.len?
-//		printf("text is %s, this should be null %s end\n", text, opt.b64_s);
-//		size_t k = 0;
-//		while (k < 16)
-//			printf("char is %c\n", opt.b64_s[k++]);
+		opt.len = opt.offset;
+		tmp = text;
+		text = (unsigned char *)malloc(opt.len * sizeof(unsigned char));
+		ft_memcpy(text, opt.b64_s, opt.len);
+		ft_bzero(opt.b64_s, opt.len);
 		free(tmp);
 	}
 	encrypt_decrypt(text, opt);

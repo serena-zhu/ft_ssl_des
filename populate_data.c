@@ -6,21 +6,24 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/20 17:27:33 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/23 20:30:59 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/24 23:04:15 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl_des.h"
 
+/*
+**	opt->len saves number of bytes read for input text
+** 	opt->offset saves current number of bytes encoded/decoded in base64, which
+**	in the end gives the total number of bytes of encoded/decoded text
+*/
+
 void				initialize_opt(t_opt *opt, int des_cbc)
 {
-	unsigned char *tmp;
-
 	opt->len = 0;
 	opt->encrypt = 1;
 	opt->base64 = 0;
-	tmp = strnew(4);
-	opt->b64_s = tmp;
+	opt->offset = 0;
 	opt->fd_in = 0;
 	opt->fd_out = 1;
 	opt->des_cbc = des_cbc;
