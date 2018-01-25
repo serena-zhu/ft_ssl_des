@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/11 15:03:26 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/23 20:51:37 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/25 14:47:15 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,9 @@ int		main(int argc, char **argv)
 			base64(argc, argv);
 		else if (ft_strcmp(argv[1], "des") == 0
 										|| ft_strcmp(argv[1], "des-ecb") == 0)
-			des_ecb(argc, argv, 0);
+			des(argc, argv, 0);
 		else if (ft_strcmp(argv[1], "des-cbc") == 0)
-			des_ecb(argc, argv, 1);
+			des(argc, argv, 1);
 		else
 		{
 			ft_putstr("ft_ssl: Error: '");

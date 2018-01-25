@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/20 17:27:33 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/25 13:36:58 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/25 15:03:30 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,53 @@ void				initialize_opt(t_opt *opt, int des_cbc)
 	opt->fd_out = 1;
 	opt->padded = 0;
 	opt->des_cbc = des_cbc;
-	opt->key = NULL;
+	opt->key_flag = 0;
+	opt->iv_flag = 0;
+	opt->key = 0;
 	opt->iv = 0;
 	opt->offset = 0;
+}
+
+/*
+** specifier [1] : opt->key
+** specifier [2] : opt->iv
+*/
+
+static void			invalid_hexdigit(int specifier)
+{
+	ft_putstr("non-hex digit\ninvalid hex ");
+	if (specifier == 1)
+		ft_putstr("key ");
+	else if (specifier == 2)
+		ft_putstr("iv ");
+	ft_putstr("value\n");
+	exit(1);
+}
+
+void				hexstr_int(t_opt *opt, char *s, int specifier)
+{
+	int					i;
+	unsigned long long	tmp;
+
+	i = 0;
+	while (s[i] != '\0' && i < 16)
+	{
+		if (s[i] >= 'a' && s[i] <= 'f')
+			tmp = tmp * 16 + (10 + s[i] - 'a');
+		else if (s[i] >= 'A' && s[i] <= 'F')
+			tmp = tmp * 16 + (10 + s[i] - 'A');
+		else if (s[i] >= '0' && s[i] <= '9')
+			tmp = tmp * 16 + (s[i] - '0');
+		else
+			invalid_hexdigit(specifier);
+		i++;
+	}
+	while (i++ < 16)
+		tmp *= 16;
+	if (specifier == 1 && (opt->key_flag = 1))
+		opt->key = tmp;
+	else if (specifier == 2 && (opt->iv_flag = 1))
+		opt->iv = tmp;
 }
 
 static void			populate_i_o(int argc, char **argv, int j, t_opt *opt)
@@ -38,27 +82,6 @@ static void			populate_i_o(int argc, char **argv, int j, t_opt *opt)
 	}
 	else
 		opt->fd_out = j;
-}
-
-static void			populate_iv(t_opt *opt, unsigned char *iv)
-{
-	int i;
-
-	i = 0;
-	while (iv[i] != '\0' && i < 16)
-	{
-		if (iv[i] >= 'a' && iv[i] <= 'f')
-			opt->iv = opt->iv * 16 + (10 + iv[i] - 'a');
-		else if (iv[i] >= 'A' && iv[i] <= 'F')
-			opt->iv = opt->iv * 16 + (10 + iv[i] - 'A');
-		else if (iv[i] >= '0' && iv[i] <= '9')
-			opt->iv = opt->iv * 16 + (iv[i] - '0');
-		//error if invalid hex value?
-		//could populate key the same way and get rid of a function in get_permutate_subkeys
-		i++;
-	}
-	while (i++ < 16)
-		opt->iv *= 16;
 }
 
 void				populate_data(int argc, char **argv, t_opt *opt)
@@ -77,9 +100,9 @@ void				populate_data(int argc, char **argv, t_opt *opt)
 		else if (ft_strcmp(argv[j], "-i") == 0 || ft_strcmp(argv[j], "-o") == 0)
 			populate_i_o(argc, argv, ++j, opt);
 		else if (ft_strcmp(argv[j], "-k") == 0 && ++j)
-			(j < argc) ? opt->key = (unsigned char *)argv[j] : errors(argv, j, 2);
-		else if (ft_strcmp(argv[j], "-iv") == 0 && ++j)
-			(j < argc) ? populate_iv(opt, (unsigned char *)argv[j]) : errors(argv, j, 2);
+			(j < argc) ? hexstr_int(opt, argv[j], 1) : errors(argv, j, 2);
+		else if (ft_strcmp(argv[j], "-v") == 0 && ++j)
+			(j < argc) ? hexstr_int(opt, argv[j], 2) : errors(argv, j, 2);
 		else
 			errors(argv, j, 3 * (argv[j][0] == '-'));
 		j++;

@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/11 15:15:10 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/25 13:40:40 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/25 15:16:41 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,9 @@ typedef struct		s_opt
 	int					fd_out;
 	int					padded;
 	int					des_cbc;
-	unsigned char		*key;
+	int					key_flag;
+	int					iv_flag;
+	unsigned long long	key;
 	unsigned long long 	iv;
 }					t_opt;
 
@@ -45,13 +47,14 @@ void				des_cbc(int argc, char **argv);
 void				des_ecb_processes(unsigned long long s_blk, t_opt *opt);
 unsigned long long	permutate(unsigned long long in, int *permutation,
 													int tab_size, int size);
-void				get_permutate_subkeys(unsigned char *key,
+void				get_permutate_subkeys(t_opt *opt,
 												unsigned long long *subkeys);
-void				des_ecb(int argc, char **argv, int des_cbc);
+void				des(int argc, char **argv, int des_cbc);
 void				b64_encrypt(unsigned char *s, t_opt *opt, int j);
 void				b64_decrypt(unsigned char *s, t_opt *opt, int i, int j);
 void				base64(int argc, char **argv);
 void				errors(char **argv, int i, int error);
+void				hexstr_int(t_opt *opt, char *s, int specifier);
 void				populate_data(int argc, char **argv, t_opt *opt);
 void				initialize_opt(t_opt *opt, int des_cbc);
 int					main(int argc, char **argv);
