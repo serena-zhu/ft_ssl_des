@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/11 15:15:10 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/24 23:16:41 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/25 13:40:40 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,26 +17,32 @@
 # include "libft.h"
 # include <fcntl.h>
 
+/*
+**	opt->len saves number of bytes read for input text
+** 	opt->offset saves current number of bytes encoded/decoded in base64, which
+**	in the end gives the total number of bytes of encoded/decoded text
+*/
+
 typedef struct		s_opt
 {
-	int				len;
-	int				encrypt;
-	int				base64;
-	unsigned char	*b64_s;
-	int				offset;
-	int				fd_in;
-	int				fd_out;
-	int				des_cbc;
-	unsigned char	*key;
-	unsigned char	*iv;
+	int					len;
+	int					encrypt;
+	int					base64;
+	unsigned char		*b64_s;
+	int					offset;
+	int					fd_in;
+	int					fd_out;
+	int					padded;
+	int					des_cbc;
+	unsigned char		*key;
+	unsigned long long 	iv;
 }					t_opt;
 
 void				putnstr_fd(unsigned char const *s, int fd, int len);
 unsigned char		*read_data(t_opt *opt);
 long long			ft_power(long long nbr, int power);
 void				des_cbc(int argc, char **argv);
-void				des_ecb_processes(unsigned long long s_blk, t_opt *opt,
-																int padded);
+void				des_ecb_processes(unsigned long long s_blk, t_opt *opt);
 unsigned long long	permutate(unsigned long long in, int *permutation,
 													int tab_size, int size);
 void				get_permutate_subkeys(unsigned char *key,

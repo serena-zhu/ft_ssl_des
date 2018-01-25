@@ -6,12 +6,12 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/18 11:39:01 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/24 23:02:57 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/25 13:41:48 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl_des.h"
-
+#include <stdio.h> //delete me!!
 int		g_ip[] = {58, 50, 42, 34, 26, 18, 10, 2,
 	60, 52, 44, 36, 28, 20, 12, 4,
 	62, 54, 46, 38, 30, 22, 14, 6,
@@ -141,36 +141,43 @@ static unsigned long long		decode(unsigned long long l,
 	return (permutate(l * 4294967296 + r, g_finalp, 64, 64));
 }
 
-static void						encrypt_decrypt(unsigned char *text, t_opt opt)
+static void						encrypt_decrypt(unsigned char *text, t_opt *opt)
 {
 	unsigned long long	subkeys[16];
 	unsigned long long	s_blk;
+	unsigned long long	tmp;
 	int					i;
 	int					j;
-	int					padded;
 
 	i = 0;
-	padded = 0;
-	get_permutate_subkeys(opt.key, subkeys);
-	while ((i < opt.len || (opt.encrypt && padded == 0)) && !(j = 0))
+	get_permutate_subkeys(opt->key, subkeys);
+	while ((i < opt->len || (opt->encrypt && opt->padded == 0)) && !(j = 0))
 	{
 		s_blk = 0;
-		while (i < opt.len && j++ < 8)
+		while (i < opt->len && j++ < 8)
 			s_blk = s_blk * 256 + (unsigned char)text[i++];
-		if (i == opt.len && j < 8 && (padded = 8 - j))
+		if (i == opt->len && j < 8 && (opt->padded = 8 - j))
 		{
 			while (j++ < 8)
-				s_blk = s_blk * 256 + padded;
+				s_blk = s_blk * 256 + opt->padded;
 		}
+		tmp = s_blk;
+		(opt->des_cbc && opt->encrypt) ? s_blk = s_blk ^ opt->iv : 0;
 		s_blk = permutate(s_blk, g_ip, 64, 64);
-		s_blk = (opt.encrypt) ? encode(s_blk / 4294967296, s_blk % 4294967296,
+		s_blk = (opt->encrypt) ? encode(s_blk / 4294967296, s_blk % 4294967296,
 				subkeys, 0) : decode(s_blk % 4294967296, s_blk / 4294967296,
 				subkeys, 16);
-		des_ecb_processes(s_blk, &opt, padded);
+		if (opt->des_cbc && !opt->encrypt)
+		{
+			s_blk = s_blk ^ opt->iv;
+			opt->iv = tmp;
+		}
+		des_ecb_processes(s_blk, opt);
 	}
 }
 
 //need to check for leaks!!!
+//need to protect malloc's
 //pad still with empty input string?
 
 void							des_ecb(int argc, char **argv, int des_cbc)
@@ -196,6 +203,6 @@ void							des_ecb(int argc, char **argv, int des_cbc)
 		ft_bzero(opt.b64_s, opt.len);
 		free(tmp);
 	}
-	encrypt_decrypt(text, opt);
+	encrypt_decrypt(text, &opt);
 	free(text);
 }

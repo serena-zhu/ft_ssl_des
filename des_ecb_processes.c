@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/23 10:52:33 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/24 22:59:00 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/25 13:40:09 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void		remove_padding_for_decryption(unsigned long long *s_blk, int *len)
 	}
 }
 
-void		des_ecb_processes(unsigned long long s_blk, t_opt *opt, int padded)
+void		des_ecb_processes(unsigned long long s_blk, t_opt *opt)
 {
 	unsigned char	blk[9];
 	int				j;
@@ -59,6 +59,8 @@ void		des_ecb_processes(unsigned long long s_blk, t_opt *opt, int padded)
 		remove_padding_for_decryption(&s_blk, &len);
 	if (s_blk != 0)
 	{
+		if (opt->des_cbc && opt->encrypt)
+			opt->iv = s_blk;
 		j = 8;
 		while (--j >= 0)
 			blk[7 - j] = s_blk / ft_power(256, j) % 256;
@@ -66,7 +68,7 @@ void		des_ecb_processes(unsigned long long s_blk, t_opt *opt, int padded)
 		{
 			ft_memcpy(opt->b64_s + opt->offset, blk, 8);
 			opt->offset += 8;
-			if (padded)
+			if (opt->padded)
 				encrypt_b64_and_print(opt);
 		}
 		else
