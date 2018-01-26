@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/20 17:27:33 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/25 15:03:30 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/25 17:49:34 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ void				initialize_opt(t_opt *opt, int des_cbc)
 	opt->key = 0;
 	opt->iv = 0;
 	opt->offset = 0;
+	opt->empty_read = 0;
 }
 
 /*

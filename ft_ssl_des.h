@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/11 15:15:10 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/25 15:16:41 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/25 18:31:43 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 # define FT_SSL_DES_H
 
 # define BUFF_SIZE 4096
-# include "libft.h"
+
+# include "libft/libft.h"
 # include <fcntl.h>
 
 /*
@@ -36,15 +37,16 @@ typedef struct		s_opt
 	int					des_cbc;
 	int					key_flag;
 	int					iv_flag;
+	int					empty_read;
 	unsigned long long	key;
-	unsigned long long 	iv;
+	unsigned long long	iv;
 }					t_opt;
 
 void				putnstr_fd(unsigned char const *s, int fd, int len);
-unsigned char		*read_data(t_opt *opt);
+unsigned char		*read_data(t_opt *opt, int ret);
 long long			ft_power(long long nbr, int power);
 void				des_cbc(int argc, char **argv);
-void				des_ecb_processes(unsigned long long s_blk, t_opt *opt);
+void				des_processes(unsigned long long s_blk, t_opt *opt);
 unsigned long long	permutate(unsigned long long in, int *permutation,
 													int tab_size, int size);
 void				get_permutate_subkeys(t_opt *opt,

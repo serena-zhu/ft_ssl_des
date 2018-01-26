@@ -6,28 +6,26 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/15 17:10:42 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/25 12:48:16 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/25 18:07:08 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl_des.h"
 
-unsigned char	*read_data(t_opt *opt)
+unsigned char	*read_data(t_opt *opt, int ret)
 {
-	int				ret;
 	int				read_count;
 	unsigned char	buf[BUFF_SIZE + 1];
 	unsigned char	*data;
 	unsigned char	*tmp;
 
-	ret = 0;
 	ft_bzero(buf, BUFF_SIZE + 1);
 	read_count = 0;
 	while ((ret = read(opt->fd_in, buf, BUFF_SIZE)))
 	{
 		tmp = data;
-		data = (unsigned char *)malloc(BUFF_SIZE * ++read_count
-													* sizeof(unsigned char));
+		if (!(data = ft_memalloc(BUFF_SIZE * ++read_count)))
+			exit(1);
 		if (read_count > 1)
 		{
 			ft_memcpy(data, tmp, BUFF_SIZE * read_count);
@@ -38,5 +36,6 @@ unsigned char	*read_data(t_opt *opt)
 		opt->len += ret;
 	}
 	(opt->fd_in > 0) ? close(opt->fd_in) : 0;
+	(opt->len == 0) ? opt->empty_read = 1 : 0;
 	return (data);
 }

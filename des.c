@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/18 11:39:01 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/25 15:16:33 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/25 18:18:02 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,14 +181,9 @@ static void						encrypt_decrypt(unsigned char *text, t_opt *opt)
 		}
 		(opt->des_cbc && opt->encrypt) ? s_blk = s_blk ^ opt->iv : 0;
 		s_blk = encrypt_decrypt2(s_blk, subkeys, opt);
-		des_ecb_processes(s_blk, opt);
+		des_processes(s_blk, opt);
 	}
 }
-
-//need to check for leaks!!!
-//need to protect malloc's
-//pad still with empty input string?
-//display "iv undefined" when iv is not provided or ask for user input?
 
 void							des(int argc, char **argv, int des_cbc)
 {
@@ -202,20 +197,19 @@ void							des(int argc, char **argv, int des_cbc)
 		hexstr_int(&opt, getpass("enter des key in hex: "), 1);
 	if (des_cbc && !opt.iv_flag)
 		hexstr_int(&opt, getpass("enter initial vector: "), 2);
-	text = read_data(&opt);
-	if (opt.base64)
-		opt.b64_s = ft_memalloc(2 * opt.len);
-//		opt.b64_s = (unsigned char *)malloc(2 * opt.len * sizeof(*opt.b64_s));
+	text = read_data(&opt, 0);
+	if (opt.base64 && !(opt.b64_s = ft_memalloc(2 * opt.len)))
+		exit(1);
 	if (opt.base64 && !opt.encrypt)
 	{
 		b64_decrypt(text, &opt, 0, 0);
 		opt.len = opt.offset;
 		tmp = text;
-		text = (unsigned char *)malloc(opt.len * sizeof(unsigned char));
+		(text = ft_memalloc(opt.len)) ? 0 : exit(1);
 		ft_memcpy(text, opt.b64_s, opt.len);
 		ft_bzero(opt.b64_s, opt.len);
-		free(tmp);
+		(!opt.empty_read) ? free(tmp) : 0;
 	}
 	encrypt_decrypt(text, &opt);
-	free(text);
+	(!opt.empty_read) ? free(text) : 0;
 }

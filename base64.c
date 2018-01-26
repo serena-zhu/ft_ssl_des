@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/15 17:18:40 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/25 14:57:46 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/01/25 18:07:29 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void			b64_encrypt(unsigned char *s, t_opt *opt, int j)
 			j--;
 		}
 		join_b64_str(opt, group, 4);
-		if (i != 0 && i % 48 == 0 && group[0] && s[i])
+		if (i != 0 && i % 48 == 0 && group[0] && i < opt->len)
 			join_b64_str(opt, (unsigned char *)"\n", 1);
 	}
 	(group[0]) ? join_b64_str(opt, (unsigned char *)"\n", 1) : 0;
@@ -100,7 +100,7 @@ void			b64_decrypt(unsigned char *s, t_opt *opt, int i, int j)
 		ft_bzero(group, 3);
 		while (i < opt->len && j < 4 && !abort && !(v_idx_l[1] = 0))
 		{
-			i = (i != 0 && i % 64 == 0 && s[i] == '\n') ? i + 1 : i;
+			i = (((i + 1) % 65 == 0) && s[i] == '\n') ? i + 1 : i;
 			while (s[i] != '=' && v_idx_l[1] < 64 && g_b64[v_idx_l[1]] != s[i])
 				v_idx_l[1]++;
 			abort = (++i && v_idx_l[1] == 64) ? 1 : 0;
@@ -129,13 +129,17 @@ void			base64(int argc, char **argv)
 
 	initialize_opt(&opt, 0);
 	populate_data(argc, argv, &opt);
-	opt.b64_s = (unsigned char *)malloc(2 * opt.len * sizeof(unsigned char));
-	s = read_data(&opt);
-	if (opt.encrypt)
-		b64_encrypt(s, &opt, 0);
-	else
-		b64_decrypt(s, &opt, 0, 0);
-	putnstr_fd(opt.b64_s, opt.fd_out, opt.offset);
-	free(opt.b64_s);
-	free(s);
+	if (!(opt.b64_s = ft_memalloc(2 * opt.len)))
+		exit(1);
+	s = read_data(&opt, 0);
+	if (!opt.empty_read)
+	{
+		if (opt.encrypt)
+			b64_encrypt(s, &opt, 0);
+		else
+			b64_decrypt(s, &opt, 0, 0);
+		putnstr_fd(opt.b64_s, opt.fd_out, opt.offset);
+		free(opt.b64_s);
+		free(s);
+	}
 }
