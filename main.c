@@ -6,7 +6,7 @@
 /*   By: yazhu <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/01/11 15:03:26 by yazhu             #+#    #+#             */
-/*   Updated: 2018/01/25 18:20:07 by yazhu            ###   ########.fr       */
+/*   Updated: 2018/02/06 21:26:02 by yazhu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int		main(int argc, char **argv)
 {
 	if (argc == 1)
-		ft_putstr("usage: ft_ssl command [command opts] [command args]\n");
+		ft_putstr("usage: ./ft_ssl command [command opts] [command args]\n");
 	else
 	{
 		if (ft_strcmp(argv[1], "base64") == 0)
