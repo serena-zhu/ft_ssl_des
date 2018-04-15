@@ -1,9 +1,30 @@
 # ft_ssl_des
-Recreate part of the OpenSSL functionality
 
-Cipher commands supported are base64, des-ecb (alias ecb), and des-cbc.
+ft_ssl is a program that recreates the base64, des-ecb, and des-cbc cipher commands functionalities of OpenSSL. OpenSSL is a cryptographic toolkit library that is used to secure communications over computer networks.
 
+## Contents
+
+[Installation](#install) | [Usage](#usage) | [Examples](#examples)
+
+## <a name="install">Installation</a>
+
+#### `Step 1` - clone the repo
+
+```bash
+$ git clone https://github.com/serena-zhu/ft_ssl_des.git
+```
+
+### `Step ` - compile program
+
+```bash
+$ make
+```
+
+## <a name="usage">Usage</a>
+
+```
 usage: ./ft_ssl command [command opts] [command args]
+```
 
 Supported flags are: 
 
