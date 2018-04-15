@@ -73,23 +73,33 @@ Passing invalid flags with commands will prompt the options message. Note some d
 
 | ft_ssl | OpenSSL |
 | ------ | ------- |
-|   -i   |   -in   |
-|   -k   |   -K    |
-|   -o   |   -out  |
-|   -v   |   -iv   |
+| -i | -in |
+| -k | -K |
+| -o | -out |
+| -v | -iv |
 
-Supported flags are: 
+## <a name="examples">Examples</a>
 
--a          Process base64 encoding/decoding (alias -base64)
+#### `base64`
+```bash
+$ echo foobar | ./ft_ssl base64 -e
+Zm9vYmFyCg==
+$ echo Zm9vYmFyCg== | ./ft_ssl base64 -d | cat -e
+foobar$
+```
 
--d          Decrypt the input data
+#### `des-ecb`
+```bash
+$ echo "your secret message" | ./ft_ssl des-ecb -e -a -k 8751B521C58F5416
+f3slZBwuuNgd1YxLj7Wc5PErSP5NN8QZ
+$echo f3slZBwuuNgd1YxLj7Wc5PErSP5NN8QZ | ./ft_ssl des-ecb -d -a -k 8751B521C58F5416 | cat -e
+your secret message$
+```
 
--e          Encrypt the input data (default)
-
--i          Input file to read from (default stdin)
-
--k          Key to use, specified as a hexidecimal string
-
--o          Output file to write to (default stdout)
-
--v          IV to use, specified as a hexidecimal string
+#### `des-cbc`
+```bash
+$ echo "your deep dark secret" | ./ft_ssl des-cbc -k 1E58B9952D147024 -v 987578ACDF577335 -o file.txt && cat -e file.txt
+vQ^\M-j:M-0M-eM-=M-n>+M-YM-S3M-mM-;M-IoXM-j*M-[:^U
+$ ./ft_ssl des-cbc -d -k 1E58B9952D147024 -v 987578ACDF577335 -i file.txt
+your deep dark secret
+```
