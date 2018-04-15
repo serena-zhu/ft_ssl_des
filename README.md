@@ -24,7 +24,7 @@ The Makefile will compile a program named ft_ssl.
 
 ## <a name="usage">Usage</a>
 
-#### `General usage`
+#### `General Usage`
 ```
 $ ./ft_ssl
 usage: ./ft_ssl command [command opts] [command args]
@@ -71,12 +71,13 @@ Valid cipher values:
 
 Passing invalid flags with commands will prompt the options message. Note some differences in the names of the options as compared to those in OpenSSL:
 
-ft_ssl | OpenSSL
--i | -in
--k | -K
--o | -out
--v | -iv
-
+```
+Table ft_ssl | Table OpenSSL
+Table -i | Table -in
+Table -k | Table -K
+Table -o | Table -out
+Table -v | Table -iv
+```
 
 Supported flags are: 
 
