@@ -14,7 +14,7 @@ ft_ssl is a program that recreates the base64, des-ecb, and des-cbc cipher comma
 $ git clone https://github.com/serena-zhu/ft_ssl_des.git
 ```
 
-### `Step 2` - compile program
+#### `Step 2` - compile program
 
 ```bash
 $ make
@@ -24,12 +24,14 @@ The Makefile will compile a program named ft_ssl.
 
 ## <a name="usage">Usage</a>
 
+#### `General usage`
 ```
 $ ./ft_ssl
 usage: ./ft_ssl command [command opts] [command args]
 ```
 Running the program name without any arguments will prompt the usage message.
 
+#### `Supported Commands`
 ```
 $ ./ft_ssl asdf
 ft_ssl: Error: 'asdf' is an invalid command.
@@ -44,8 +46,9 @@ des
 des-ecb
 des-cbc
 ```
-Passing an unsupprted command will prompt the valid commands message. Note des is added as an alias for des-ecb. 
+Passing an unsupprted command will prompt the valid commands message. Note des is added as an alias for des-ecb. Standard and message digest commands along with more cipher commands will be added in future projects.
 
+#### `Supported Options`
 ```
 $ ./ft_ssl base64 asdf
 unknown option 'asdf'
