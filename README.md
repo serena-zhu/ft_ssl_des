@@ -88,7 +88,7 @@ Valid cipher values:
 Passing invalid flags with commands will prompt the options message. Note some differences in the names of the options as compared to those in OpenSSL:
 
 | ft_ssl | OpenSSL |
-| ------ | ------- |
+| :---: | :---: |
 | -i | -in |
 | -k | -K |
 | -o | -out |
