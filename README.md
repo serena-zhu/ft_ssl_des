@@ -4,7 +4,21 @@ ft_ssl is a program that recreates the functionalities of OpenSSL's base64, des-
 
 ## Contents
 
-[Installation](#install) | [Usage](#usage) | [Examples](#examples)
+[Language & Functions Used](#language_functions) | [Installation](#install) | [Usage](#usage) | [Examples](#examples)
+
+## <a name="language_functions">Language & Functions Used</a>
+
+The ft_ssl program is written entirely in C, using only the following functions from the standard C libraries:
+
+* open
+* close
+* read
+* write
+* getpass
+* malloc
+* free
+
+<a href="#top">↥ back to top</a>
 
 ## <a name="install">Installation</a>
 
