@@ -71,13 +71,12 @@ Valid cipher values:
 
 Passing invalid flags with commands will prompt the options message. Note some differences in the names of the options as compared to those in OpenSSL:
 
-```
-Table ft_ssl | Table OpenSSL
-Table -i | Table -in
-Table -k | Table -K
-Table -o | Table -out
-Table -v | Table -iv
-```
+| ft_ssl | OpenSSL |
+| ------ | ------- |
+|   -i   |   -in   |
+|   -k   |   -K    |
+|   -o   |   -out  |
+|   -v   |   -iv   |
 
 Supported flags are: 
 
