@@ -1,4 +1,4 @@
-# ft_ssl_des
+# <a name="top">ft_ssl_des</a>
 
 ft_ssl is a program that recreates the base64, des-ecb, and des-cbc cipher commands functionalities of OpenSSL. OpenSSL is a cryptographic toolkit library that is used to secure communications over computer networks.
 
@@ -21,6 +21,8 @@ $ make
 ```
 
 The Makefile will compile a program named ft_ssl.
+
+<a href="#top">↥ back to top</a>
 
 ## <a name="usage">Usage</a>
 
@@ -78,6 +80,8 @@ Passing invalid flags with commands will prompt the options message. Note some d
 | -o | -out |
 | -v | -iv |
 
+<a href="#top">↥ back to top</a>
+
 ## <a name="examples">Examples</a>
 
 #### `base64`
@@ -103,3 +107,5 @@ vQ^\M-j:M-0M-eM-=M-n>+M-YM-S3M-mM-;M-IoXM-j*M-[:^U
 $ ./ft_ssl des-cbc -d -k 1E58B9952D147024 -v 987578ACDF577335 -i file.txt
 your deep dark secret
 ```
+
+<a href="#top">↥ back to top</a>
