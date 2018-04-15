@@ -92,7 +92,7 @@ foobar$
 ```bash
 $ echo "your secret message" | ./ft_ssl des-ecb -e -a -k 8751B521C58F5416
 f3slZBwuuNgd1YxLj7Wc5PErSP5NN8QZ
-$echo f3slZBwuuNgd1YxLj7Wc5PErSP5NN8QZ | ./ft_ssl des-ecb -d -a -k 8751B521C58F5416 | cat -e
+$echo f3slZBwuuNgd1YxLj7Wc5PErSP5NN8QZ | ./ft_ssl des -d -a -k 8751B521C58F5416 | cat -e
 your secret message$
 ```
 
