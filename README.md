@@ -1,6 +1,6 @@
 # <a name="top">ft_ssl_des</a>
 
-ft_ssl is a program that recreates the base64, des-ecb, and des-cbc cipher commands functionalities of OpenSSL. OpenSSL is a cryptographic toolkit library that is used to secure communications over computer networks.
+ft_ssl is a program that recreates the functionalities of OpenSSL's base64, des-ecb, and des-cbc cipher commands. OpenSSL is a cryptographic toolkit library that is used to secure communications over computer networks.
 
 ## Contents
 
