@@ -31,7 +31,7 @@ The Makefile will compile a program named ft_ssl.
 $ ./ft_ssl
 usage: ./ft_ssl command [command opts] [command args]
 ```
-Running the program name without any arguments will prompt the usage message.
+Running the program without any arguments will prompt the usage message.
 
 #### `Supported Commands`
 ```
@@ -48,7 +48,7 @@ des
 des-ecb
 des-cbc
 ```
-Passing an unsupprted command will prompt the valid commands message. Note des is added as an alias for des-ecb. Standard and message digest commands along with more cipher commands will be added in future projects.
+Passing an unsupported command will prompt the valid commands message. Note des is added as an alias for des-ecb. Standard and message digest commands along with more cipher commands will be added in future projects.
 
 #### `Supported Options`
 ```
