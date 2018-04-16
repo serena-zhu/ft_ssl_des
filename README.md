@@ -41,14 +41,14 @@ The Makefile will compile a program named ft_ssl.
 ## <a name="usage">Usage</a>
 
 #### `General Usage`
-```
+```bash
 $ ./ft_ssl
 usage: ./ft_ssl command [command opts] [command args]
 ```
 Running the program without any parameters will prompt the usage message.
 
 #### `Supported Commands`
-```
+```bash
 $ ./ft_ssl asdf
 ft_ssl: Error: 'asdf' is an invalid command.
 
@@ -65,7 +65,7 @@ des-cbc
 Passing an unsupported command will prompt the valid commands message. Note des is added as an alias for des-ecb. Standard and message digest commands along with more cipher commands will be added in future projects.
 
 #### `Supported Options`
-```
+```bash
 $ ./ft_ssl base64 asdf
 unknown option 'asdf'
 usage: enc -ciphername [-ade] [-base64] [-i file] [-v IV] [-k key] [-o file]
