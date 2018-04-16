@@ -45,7 +45,7 @@ The Makefile will compile a program named ft_ssl.
 $ ./ft_ssl
 usage: ./ft_ssl command [command opts] [command args]
 ```
-Running the program without any arguments will prompt the usage message.
+Running the program without any parameters will prompt the usage message.
 
 #### `Supported Commands`
 ```
